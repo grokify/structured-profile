@@ -1,0 +1,51 @@
+{
+  "irVersion": "1.0",
+  "project": "structured-profile",
+  "repository": "https://github.com/grokify/structured-profile",
+  "versioning": "semver",
+  "commitConvention": "conventional",
+  "maintainers": ["grokify", "johncwang@gmail.com"],
+  "releases": [
+    {
+      "version": "v0.1.0",
+      "date": "2026-04-16",
+      "highlights": [
+        { "description": "Initial release with structured profile schema, JD parsing, and AI-powered resume generation pipeline" }
+      ],
+      "added": [
+        { "description": "Structured profile JSON schema for career data (experience, education, skills, achievements)", "commit": "5c40e0f" },
+        { "description": "Job description parser extracting requirements from markdown files", "commit": "3f42866" },
+        { "description": "Profile-to-JD matcher with keyword-based scoring and gap analysis", "commit": "b3eca91" },
+        { "description": "JSON file-based profile storage with default directory `~/.sprofile/profiles/`", "commit": "59c67f3" },
+        { "description": "Resume generation service creating tailored resumes from profile + JD", "commit": "cf45426" },
+        { "description": "Cover letter generation service with customization options", "commit": "cf45426" },
+        { "description": "PDF/DOCX export via Pandoc with configurable fonts and margins", "commit": "ee3b1c9" },
+        { "description": "Data migration utilities for converting legacy formats", "commit": "12376bc" },
+        { "description": "`sprofile` CLI with `resume generate` and `cover generate` commands", "commit": "6f559a1" },
+        { "description": "AI agent specifications for semantic resume generation pipeline", "commit": "b8aa710" },
+        { "description": "`jd-analyst` agent for semantic job description parsing", "commit": "b8aa710" },
+        { "description": "`profile-matcher` agent for profile-to-JD matching with scoring", "commit": "b8aa710" },
+        { "description": "`resume-generator` agent for tailored resume creation", "commit": "b8aa710" },
+        { "description": "`resume-evaluator` agent for LLM-as-Judge quality scoring", "commit": "b8aa710" },
+        { "description": "`resume-refiner` agent for feedback-based improvement", "commit": "b8aa710" },
+        { "description": "`resume-coordinator` agent for pipeline orchestration", "commit": "b8aa710" }
+      ],
+      "documentation": [
+        { "description": "Product requirements document (PRD)", "commit": "825064c" },
+        { "description": "Technical requirements document (TRD)", "commit": "825064c" },
+        { "description": "Development roadmap", "commit": "825064c" },
+        { "description": "Implementation plan and task tracking", "commit": "825064c" }
+      ],
+      "tests": [
+        { "description": "Sample structured profile for testing (john-wang.json)", "commit": "3d9df08" },
+        { "description": "Sample job description for integration tests", "commit": "3d9df08" }
+      ],
+      "infrastructure": [
+        { "description": "Go module configuration with dependencies", "commit": "a286dfb" },
+        { "description": "golangci-lint configuration", "commit": "a286dfb" },
+        { "description": "Makefile for build, test, and lint commands", "commit": "a286dfb" },
+        { "description": "Claude Code agent configuration", "commit": "99fdd52" }
+      ]
+    }
+  ]
+}
