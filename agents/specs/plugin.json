@@ -1,0 +1,16 @@
+{
+  "name": "structured-profile",
+  "version": "0.3.0",
+  "description": "AI-powered resume and cover letter generation from structured profiles with semantic matching",
+  "author": "grokify",
+  "license": "MIT",
+  "repository": "https://github.com/grokify/structured-profile",
+  "homepage": "https://github.com/grokify/structured-profile",
+  "agents": "agents",
+  "skills": "skills",
+  "context": "# Structured Profile Resume Pipeline\n\nThis plugin provides AI-powered resume generation using semantic matching.\n\n## Available Skills\n\n- `/structured-profile:parse-jd <file>` - Parse job description semantically\n- `/structured-profile:generate-resume --profile <id> --jd <file>` - Generate tailored resume\n\n## Agent Team\n\n- resume-coordinator - Orchestrates the pipeline\n- jd-analyst - Semantic JD analysis\n- profile-matcher - Profile-to-JD matching\n- resume-generator - Tailored resume creation\n- resume-evaluator - LLM-as-Judge quality scoring\n- resume-refiner - Feedback-based improvement\n\n## Workflow\n\nJD → Analysis → Matching → Generation → Evaluation → (Refinement) → Output",
+  "dependencies": [
+    {"name": "pandoc", "command": "pandoc", "optional": true},
+    {"name": "sprofile", "command": "sprofile", "optional": true}
+  ]
+}

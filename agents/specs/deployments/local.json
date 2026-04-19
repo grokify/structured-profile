@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/plexusone/multi-agent-spec/main/schema/deployment/deployment.schema.json",
+  "team": "resume-pipeline",
+  "targets": [
+    {
+      "name": "claude-code-local",
+      "platform": "claude-code",
+      "mode": "single-process",
+      "priority": "p1",
+      "output": "agents/plugins/claude-code",
+      "config": {
+        "agentDir": "agents/plugins/claude-code/agents",
+        "format": "markdown",
+        "team_mode": "team",
+        "teammate_mode": "in-process",
+        "enable_teams": true
+      }
+    },
+    {
+      "name": "kiro-cli-local",
+      "platform": "kiro-cli",
+      "mode": "single-process",
+      "priority": "p2",
+      "output": "agents/plugins/kiro-cli",
+      "config": {
+        "agentDir": "agents/plugins/kiro-cli/agents",
+        "format": "json"
+      }
+    }
+  ]
+}

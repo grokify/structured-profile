@@ -1,0 +1,165 @@
+{
+  "$schema": "https://raw.githubusercontent.com/plexusone/multi-agent-spec/main/schema/orchestration/team.schema.json",
+  "name": "resume-pipeline",
+  "version": "0.3.0",
+  "description": "AI-powered resume generation pipeline with semantic matching and quality evaluation",
+  "agents": [
+    "resume-coordinator",
+    "jd-analyst",
+    "profile-matcher",
+    "resume-generator",
+    "resume-evaluator",
+    "resume-refiner"
+  ],
+  "orchestrator": "resume-coordinator",
+  "workflow": {
+    "type": "graph",
+    "steps": [
+      {
+        "name": "analyze-jd",
+        "agent": "jd-analyst",
+        "inputs": [
+          {
+            "name": "jd_path",
+            "type": "file",
+            "required": true,
+            "description": "Path to job description markdown file"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "jd_analysis",
+            "type": "object",
+            "description": "Structured JD analysis with semantic mappings"
+          }
+        ]
+      },
+      {
+        "name": "match-profile",
+        "agent": "profile-matcher",
+        "depends_on": ["analyze-jd"],
+        "inputs": [
+          {
+            "name": "profile_path",
+            "type": "file",
+            "required": true,
+            "description": "Path to profile JSON file"
+          },
+          {
+            "name": "jd_analysis",
+            "type": "object",
+            "from": "analyze-jd.jd_analysis",
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "name": "match_result",
+            "type": "object",
+            "description": "Ranked achievements and skill mappings"
+          }
+        ]
+      },
+      {
+        "name": "generate-resume",
+        "agent": "resume-generator",
+        "depends_on": ["match-profile"],
+        "inputs": [
+          {
+            "name": "profile_path",
+            "type": "file",
+            "from": "match-profile.profile_path"
+          },
+          {
+            "name": "jd_analysis",
+            "type": "object",
+            "from": "analyze-jd.jd_analysis"
+          },
+          {
+            "name": "match_result",
+            "type": "object",
+            "from": "match-profile.match_result"
+          },
+          {
+            "name": "domain",
+            "type": "string",
+            "required": false,
+            "description": "Optional domain filter (devx, iam, platform)"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "resume_md",
+            "type": "string",
+            "description": "Generated resume in Markdown format"
+          }
+        ]
+      },
+      {
+        "name": "evaluate-resume",
+        "agent": "resume-evaluator",
+        "depends_on": ["generate-resume"],
+        "inputs": [
+          {
+            "name": "resume_md",
+            "type": "string",
+            "from": "generate-resume.resume_md"
+          },
+          {
+            "name": "jd_analysis",
+            "type": "object",
+            "from": "analyze-jd.jd_analysis"
+          },
+          {
+            "name": "match_result",
+            "type": "object",
+            "from": "match-profile.match_result"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "evaluation",
+            "type": "object",
+            "description": "Structured evaluation with scores and feedback"
+          }
+        ]
+      },
+      {
+        "name": "refine-resume",
+        "agent": "resume-refiner",
+        "depends_on": ["evaluate-resume"],
+        "condition": "evaluate-resume.evaluation.overall_score < 85",
+        "inputs": [
+          {
+            "name": "resume_md",
+            "type": "string",
+            "from": "generate-resume.resume_md"
+          },
+          {
+            "name": "evaluation",
+            "type": "object",
+            "from": "evaluate-resume.evaluation"
+          },
+          {
+            "name": "profile_path",
+            "type": "file",
+            "from": "match-profile.profile_path"
+          }
+        ],
+        "outputs": [
+          {
+            "name": "refined_resume_md",
+            "type": "string",
+            "description": "Improved resume with feedback addressed"
+          },
+          {
+            "name": "change_log",
+            "type": "object",
+            "description": "Summary of changes made"
+          }
+        ]
+      }
+    ]
+  },
+  "context": "This pipeline generates tailored resumes by semantically matching candidate profiles to job requirements. It uses LLM-based understanding rather than keyword matching, enabling it to recognize that 'developer advocacy' maps to 'technical enablement' and '250 blog articles' demonstrates 'training experience'."
+}
