@@ -1,0 +1,72 @@
+site_name: structured-profile
+site_description: Go library for structured professional profiles and AI-powered resume generation
+site_url: https://grokify.github.io/structured-profile/
+repo_url: https://github.com/grokify/structured-profile
+repo_name: grokify/structured-profile
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Profile Format: getting-started/profile-format.md
+  - Pipeline:
+    - Overview: pipeline/overview.md
+    - Dual Evaluation: pipeline/dual-evaluation.md
+    - AI Agents: pipeline/agents.md
+  - Schema Reference:
+    - Profile: schema/profile.md
+    - Match Evaluation: schema/matcheval.md
+    - Document Evaluation: schema/doceval.md
+  - Reference:
+    - Match Categories: reference/match-categories.md
+    - Document Categories: reference/doc-categories.md
+    - Severity Levels: reference/severity.md
+    - CLI Commands: reference/cli.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/grokify/structured-profile
