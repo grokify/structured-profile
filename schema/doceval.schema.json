@@ -1,0 +1,343 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/grokify/structured-profile/schema/doceval.schema.json",
+  "title": "DocEvaluation",
+  "description": "Resume and cover letter quality evaluation schema for structured-profile",
+  "type": "object",
+  "required": ["metadata", "job", "documents", "eval", "decision"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "metadata": {
+      "$ref": "#/$defs/DocEvalMetadata"
+    },
+    "job": {
+      "$ref": "#/$defs/JobSummary"
+    },
+    "documents": {
+      "$ref": "#/$defs/DocumentSet"
+    },
+    "eval": {
+      "$ref": "#/$defs/DocEvalResult"
+    },
+    "decision": {
+      "$ref": "#/$defs/DocEvalDecision"
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DocActionItem"
+      }
+    }
+  },
+  "$defs": {
+    "DocEvalMetadata": {
+      "type": "object",
+      "required": ["evaluationId", "generatedAt", "generatedBy", "schemaVersion"],
+      "properties": {
+        "evaluationId": {
+          "type": "string",
+          "description": "Unique evaluation identifier"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "generatedBy": {
+          "type": "string",
+          "description": "Agent or pipeline that generated this"
+        },
+        "model": {
+          "type": "string",
+          "description": "LLM model used"
+        },
+        "modelProvider": {
+          "type": "string",
+          "description": "LLM provider (anthropic, openai, etc.)"
+        },
+        "schemaVersion": {
+          "type": "string",
+          "description": "Version of this schema"
+        },
+        "matchEvalId": {
+          "type": "string",
+          "description": "Reference to the profile match evaluation"
+        }
+      }
+    },
+    "JobSummary": {
+      "type": "object",
+      "required": ["documentPath", "title", "company"],
+      "properties": {
+        "documentPath": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "level": {
+          "type": "string"
+        },
+        "location": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "compensation": {
+          "type": "string"
+        }
+      }
+    },
+    "DocumentSet": {
+      "type": "object",
+      "required": ["resumePath"],
+      "properties": {
+        "resumePath": {
+          "type": "string"
+        },
+        "coverLetterPath": {
+          "type": "string"
+        },
+        "resumeFormat": {
+          "type": "string",
+          "enum": ["md", "pdf", "docx"]
+        },
+        "coverLetterFormat": {
+          "type": "string",
+          "enum": ["md", "pdf", "docx"]
+        }
+      }
+    },
+    "DocEvalResult": {
+      "type": "object",
+      "required": ["overallScore", "weightedScore", "categories", "findings"],
+      "properties": {
+        "overallScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "0-100 percentage score"
+        },
+        "weightedScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "0-10 scale"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DocEvalCategory"
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DocEvalFinding"
+          }
+        }
+      }
+    },
+    "DocEvalCategory": {
+      "type": "object",
+      "required": ["category", "weight", "score", "status", "justification"],
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/DocCategoryType"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Weight for this category (should sum to ~1.0)"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "maxScore": {
+          "type": "number",
+          "default": 10
+        },
+        "status": {
+          "$ref": "#/$defs/ScoreStatus"
+        },
+        "justification": {
+          "type": "string",
+          "description": "Why this score was given"
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Supporting examples from documents"
+        },
+        "suggestions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Improvement suggestions"
+        }
+      }
+    },
+    "DocCategoryType": {
+      "type": "string",
+      "enum": [
+        "keyword_coverage",
+        "achievement_relevance",
+        "gap_mitigation",
+        "quantification",
+        "ats_compatibility",
+        "narrative_coherence",
+        "summary_impact",
+        "experience_ordering",
+        "skills_alignment",
+        "formatting",
+        "opening_hook",
+        "value_proposition",
+        "company_fit",
+        "call_to_action"
+      ],
+      "description": "Document quality dimensions"
+    },
+    "ScoreStatus": {
+      "type": "string",
+      "enum": ["pass", "warn", "fail", "needs_improvement"],
+      "description": "Category status (pass >= 7.0, warn >= 5.0, fail < 5.0)"
+    },
+    "DocEvalFinding": {
+      "type": "object",
+      "required": ["id", "document", "category", "findingType", "severity", "title", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique finding ID (DS001 for doc strength, DG001 for doc gap)"
+        },
+        "document": {
+          "$ref": "#/$defs/DocumentType"
+        },
+        "category": {
+          "$ref": "#/$defs/DocCategoryType"
+        },
+        "findingType": {
+          "type": "string",
+          "enum": ["strength", "gap"]
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string",
+          "description": "Section or line reference"
+        },
+        "currentText": {
+          "type": "string",
+          "description": "What the document currently says"
+        },
+        "suggestedText": {
+          "type": "string",
+          "description": "Suggested replacement text"
+        },
+        "recommendation": {
+          "type": "string"
+        },
+        "effort": {
+          "$ref": "#/$defs/EffortLevel"
+        }
+      }
+    },
+    "DocumentType": {
+      "type": "string",
+      "enum": ["resume", "cover_letter", "both"],
+      "description": "Which document a finding applies to"
+    },
+    "Severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low", "info"],
+      "description": "Finding severity"
+    },
+    "EffortLevel": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "DocEvalDecision": {
+      "type": "object",
+      "required": ["status", "passed", "rationale", "findingCounts", "overallScore", "readyToSubmit"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["excellent", "good", "needs_work", "major_revision"]
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "findingCounts": {
+          "$ref": "#/$defs/FindingCounts"
+        },
+        "overallScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "weightedScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "readyToSubmit": {
+          "type": "boolean",
+          "description": "Whether documents can be submitted as-is"
+        }
+      }
+    },
+    "FindingCounts": {
+      "type": "object",
+      "properties": {
+        "critical": { "type": "integer", "minimum": 0 },
+        "high": { "type": "integer", "minimum": 0 },
+        "medium": { "type": "integer", "minimum": 0 },
+        "low": { "type": "integer", "minimum": 0 },
+        "info": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "DocActionItem": {
+      "type": "object",
+      "required": ["action", "document", "category", "severity", "effort"],
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "document": {
+          "$ref": "#/$defs/DocumentType"
+        },
+        "category": {
+          "$ref": "#/$defs/DocCategoryType"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "effort": {
+          "$ref": "#/$defs/EffortLevel"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1 = highest priority"
+        }
+      }
+    }
+  }
+}
