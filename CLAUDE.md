@@ -173,6 +173,56 @@ Tone: Professional, confident, authentic
 Length: 3-4 paragraphs, under 400 words
 ```
 
+## Dual Evaluation Approach
+
+Run **two evaluations** for each application:
+
+| Evaluation | Schema | Purpose | When |
+|------------|--------|---------|------|
+| **Profile Match** | `matcheval.json` | Does candidate's experience fit the role? | Before generating documents |
+| **Document Quality** | `doceval.json` | Do documents effectively present the fit? | After generating documents |
+
+### Why Both Matter
+
+**matcheval.json** answers:
+- Should I apply at all?
+- What strengths to highlight?
+- What gaps need addressing?
+- Realistic match score?
+
+**doceval.json** answers:
+- Does resume highlight the right achievements?
+- Are JD keywords represented?
+- Are gaps mitigated in cover letter?
+- Is it ATS-compatible?
+- Ready to submit?
+
+## Generating a Document Evaluation
+
+Use the **doceval schema** (`schema/doceval.go`) after generating resume/cover letter:
+
+```
+Evaluate document quality and output doceval.json:
+
+1. Score each category (0-10 scale):
+   - keyword_coverage, achievement_relevance, gap_mitigation
+   - quantification, ats_compatibility, narrative_coherence
+   - value_proposition (cover letter)
+
+2. Record findings (strengths and gaps):
+   - id: DS001 for doc strength, DG001 for doc gap
+   - document: resume, cover_letter, both
+   - Include currentText and suggestedText for fixes
+
+3. Compute decision:
+   - Status: excellent/good/needs_work/major_revision
+   - readyToSubmit: boolean
+
+4. List prioritized action items
+```
+
+Output follows `schema/doceval.schema.json`.
+
 ## Application Directory Structure
 
 For each job application, create:
@@ -185,7 +235,8 @@ applications/app_{date}_{company}_{role}/
 ├── resume.md            # Tailored resume (markdown)
 ├── resume.pdf           # PDF export (via pandoc)
 ├── coverletter.md       # Cover letter (markdown)
-└── coverletter.pdf      # PDF export (via pandoc)
+├── coverletter.pdf      # PDF export (via pandoc)
+└── doceval.json         # Document quality evaluation
 ```
 
 ## Quick Reference Commands
@@ -255,3 +306,40 @@ StrictPassCriteria{
     MinScore:    80.0, // 80% minimum match
 }
 ```
+
+## Document Quality Categories
+
+Standard categories defined in `schema/doceval.go`:
+
+| Category | Document | Description |
+|----------|----------|-------------|
+| `keyword_coverage` | Both | JD keywords represented in documents |
+| `achievement_relevance` | Resume | Top achievements align with JD |
+| `gap_mitigation` | Cover Letter | Known gaps addressed |
+| `quantification` | Resume | Achievements include metrics |
+| `ats_compatibility` | Resume | Format compatible with ATS |
+| `narrative_coherence` | Both | Documents tell coherent story |
+| `summary_impact` | Resume | Summary hooks the reader |
+| `value_proposition` | Cover Letter | Clear unique value stated |
+| `company_fit` | Cover Letter | Connection to company needs |
+
+## Document Quality Criteria
+
+```go
+DocEvalCriteria{
+    MaxCritical:       0,     // No critical issues
+    MaxHigh:           0,     // No high issues
+    MaxMedium:         2,     // Max 2 medium issues
+    MinScore:          75.0,  // 75% minimum quality
+    MinKeywordCoverage: 70.0, // 70% JD keywords
+}
+```
+
+## Document Decision Status
+
+| Status | Description | Action |
+|--------|-------------|--------|
+| `excellent` | Ready to submit | Submit as-is |
+| `good` | Minor improvements optional | Submit or polish |
+| `needs_work` | Should address issues | Revise before submitting |
+| `major_revision` | Significant rewrite needed | Major edits required |
